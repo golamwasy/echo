@@ -1,0 +1,54 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: guestbook
+      POSTGRES_USER: guestbook
+      POSTGRES_PASSWORD: guestbook
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - traefik-net
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: guestbook
+      DB_USER: guestbook
+      DB_PASSWORD: guestbook
+    depends_on:
+      - postgres
+    networks:
+      - traefik-net
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.guestbook-api.rule=Host(`api.homelab.local`)"
+      - "traefik.http.routers.guestbook-api.entrypoints=web"
+      - "traefik.http.services.guestbook-api.loadbalancer.server.port=8080"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://api.homelab.local
+    depends_on:
+      - backend
+    networks:
+      - traefik-net
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.guestbook-app.rule=Host(`app.homelab.local`)"
+      - "traefik.http.routers.guestbook-app.entrypoints=web"
+      - "traefik.http.services.guestbook-app.loadbalancer.server.port=80"
+
+networks:
+  traefik-net:
+    external: true
+
+volumes:
+  postgres-data:
