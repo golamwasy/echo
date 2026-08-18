@@ -11,6 +11,22 @@ services:
       - traefik-net
     restart: unless-stopped
 
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ""
+    depends_on:
+      - backend
+    networks:
+      - traefik-net
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.guestbook-app.rule=Host(`echo.golamwasy.dev`)"
+      - "traefik.http.routers.guestbook-app.entrypoints=web"
+      - "traefik.http.services.guestbook-app.loadbalancer.server.port=80"
+
   backend:
     build: ./backend
     environment:
@@ -26,25 +42,9 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.guestbook-api.rule=Host(`api.homelab.local`)"
+      - "traefik.http.routers.guestbook-api.rule=Host(`echo.golamwasy.dev`) && PathPrefix(`/api`)"
       - "traefik.http.routers.guestbook-api.entrypoints=web"
       - "traefik.http.services.guestbook-api.loadbalancer.server.port=8080"
-
-  frontend:
-    build:
-      context: ./frontend
-      args:
-        VITE_API_URL: http://api.homelab.local
-    depends_on:
-      - backend
-    networks:
-      - traefik-net
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.guestbook-app.rule=Host(`app.homelab.local`)"
-      - "traefik.http.routers.guestbook-app.entrypoints=web"
-      - "traefik.http.services.guestbook-app.loadbalancer.server.port=80"
 
 networks:
   traefik-net:
