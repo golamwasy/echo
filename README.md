@@ -9,7 +9,7 @@ A minimal visit-counter app: Spring Boot API + React/TS frontend + Postgres, con
 
 - Docker + Docker Compose on the host
 - An external Docker network named `traefik-net` already created, with Traefik attached to it and watching for container labels
-- `api.homelab.local` and `app.homelab.local` resolving to your server (e.g. via `/etc/hosts` on client machines, or local DNS)
+- `echo.golamwasy.dev` resolving to your server
 
 ## Deploy
 
@@ -24,10 +24,10 @@ This builds the backend and frontend images, starts Postgres, and attaches all t
 ## Verify
 
 ```bash
-curl http://api.homelab.local/api/visits
+curl http://echo.golamwasy.dev/api/visits
 ```
 
-Then open `http://app.homelab.local` in a browser — it should show a visit count that increments on each page load.
+Then open `http://echo.golamwasy.dev` in a browser — it should show a visit count that increments on each page load.
 
 ## Useful commands
 
@@ -42,4 +42,4 @@ docker compose down -v             # stop everything and wipe the database
 
 - No TLS/auth — this is intended for a trusted home network behind Traefik's plain HTTP entrypoint (`web`).
 - If your Traefik uses a different entrypoint name than `web`, update the `entrypoints` label in `docker-compose.yml` for both services.
-- The frontend's API base URL is baked in at build time via `VITE_API_URL` (see the `frontend` build args in `docker-compose.yml`). Change it there if you use different hostnames.
+- The frontend calls the API on the same origin (`VITE_API_URL` is empty), routed to the backend via the `/api` path prefix. Change the build arg in `docker-compose.yml` if you split the frontend and API onto different hostnames.

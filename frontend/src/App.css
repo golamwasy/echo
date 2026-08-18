@@ -1,0 +1,101 @@
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: radial-gradient(circle at 20% 20%, #6366f1 0%, transparent 45%),
+    radial-gradient(circle at 80% 0%, #ec4899 0%, transparent 40%),
+    radial-gradient(circle at 50% 100%, #0ea5e9 0%, transparent 45%),
+    #0f0f1a;
+  padding: 1.5rem;
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  padding: 2.75rem 2.5rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  text-align: center;
+  color: #f4f4f8;
+}
+
+.card__icon {
+  font-size: 2.25rem;
+  line-height: 1;
+  margin-bottom: 0.75rem;
+}
+
+.card h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.card__subtitle {
+  margin: 0 0 1.75rem;
+  color: rgba(244, 244, 248, 0.6);
+  font-size: 0.95rem;
+}
+
+.count {
+  font-size: 3.25rem;
+  font-weight: 800;
+  line-height: 1;
+  margin: 0;
+  background: linear-gradient(135deg, #a78bfa, #f472b6, #38bdf8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.count__label {
+  margin: 0.5rem 0 0;
+  color: rgba(244, 244, 248, 0.7);
+  font-size: 0.95rem;
+}
+
+.status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: rgba(244, 244, 248, 0.7);
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #a78bfa;
+  animation: spin 0.8s linear infinite;
+}
+
+.error {
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
