@@ -40,27 +40,13 @@ public class VisitorInfoController {
     }
 
     private String resolveClientIp(HttpServletRequest request) {
-        // Traefik sets X-Forwarded-For; take the original client, not proxies.
-        // Prefer an IPv4 address when the chain contains both, since it reads
-        // more cleanly than a long IPv6 literal.
+        // Traefik sets X-Forwarded-For; take the original client (first entry),
+        // not the proxy hops that follow it.
         String xff = request.getHeader("X-Forwarded-For");
         if (xff != null && !xff.isBlank()) {
-            String ipv6 = null;
-            for (String part : xff.split(",")) {
-                String candidate = part.trim();
-                if (candidate.isEmpty()) {
-                    continue;
-                }
-                if (candidate.contains(":")) {
-                    if (ipv6 == null) {
-                        ipv6 = candidate;
-                    }
-                    continue;
-                }
-                return candidate; // first IPv4 wins
-            }
-            if (ipv6 != null) {
-                return ipv6;
+            String first = xff.split(",")[0].trim();
+            if (!first.isEmpty()) {
+                return first;
             }
         }
         String realIp = request.getHeader("X-Real-IP");
