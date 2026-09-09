@@ -187,6 +187,42 @@ function App() {
     <div className="page">
       <canvas ref={canvasRef} className="mesh" aria-hidden="true" />
 
+      <div className="hud hud--tl">
+        <div className="hud__item">
+          <span className="hud__label">IP address</span>
+          <span className="hud__value">{visitor?.ip ?? "…"}</span>
+        </div>
+        <div className="hud__item">
+          <span className="hud__label">Location</span>
+          <span className="hud__value">{locationLabel}</span>
+        </div>
+      </div>
+
+      <div className="hud hud--tr">
+        <div className="hud__item">
+          <span className="hud__label">Timezone</span>
+          <span className="hud__value">{timezone}</span>
+        </div>
+        <div className="hud__item">
+          <span className="hud__label">Coordinates</span>
+          <span className="hud__value">{coordinates}</span>
+        </div>
+      </div>
+
+      <div className="hud hud--bl">
+        <div className="hud__item">
+          <span className="hud__label">ISP</span>
+          <span className="hud__value">{isp}</span>
+        </div>
+      </div>
+
+      <div className="hud hud--br">
+        <div className="hud__item">
+          <span className="hud__label">DNS</span>
+          <span className="hud__value">{geo?.asn ?? "Not available"}</span>
+        </div>
+      </div>
+
       <div className="card">
         <header className="card__header">
           <h1>Guestbook</h1>
@@ -219,29 +255,6 @@ function App() {
           <span className="card__dot" aria-hidden="true" />
           <span>You're visitor #{count ?? "…"}</span>
         </footer>
-
-        <dl className="info">
-          <div className="info__item">
-            <dt>IP address</dt>
-            <dd>{visitor?.ip ?? "…"}</dd>
-          </div>
-          <div className="info__item">
-            <dt>Location</dt>
-            <dd>{locationLabel}</dd>
-          </div>
-          <div className="info__item">
-            <dt>Timezone</dt>
-            <dd>{timezone}</dd>
-          </div>
-          <div className="info__item">
-            <dt>Coordinates</dt>
-            <dd>{coordinates}</dd>
-          </div>
-          <div className="info__item">
-            <dt>ISP</dt>
-            <dd>{isp}</dd>
-          </div>
-        </dl>
       </div>
     </div>
   );
