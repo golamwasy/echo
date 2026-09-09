@@ -3,9 +3,31 @@ import "./App.css";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://api.homelab.local";
 
+interface GeoInfo {
+  status?: string;
+  country?: string;
+  region?: string;
+  city?: string;
+  latitude?: number;
+  longitude?: number;
+  timezone?: string;
+  isp?: string;
+  org?: string;
+  asn?: string;
+  message?: string;
+}
+
+interface VisitorInfo {
+  ip?: string;
+  location?: GeoInfo;
+  userAgent?: string;
+  resolvedAt?: string;
+}
+
 function App() {
   const [count, setCount] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [visitor, setVisitor] = useState<VisitorInfo | null>(null);
   const [reduceMotion, setReduceMotion] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -17,6 +39,16 @@ function App() {
       })
       .then((data) => setCount(data.count))
       .catch((err) => setError(err.message));
+
+    fetch(`${API_URL}/api/visitor`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+        return res.json();
+      })
+      .then((data) => setVisitor(data))
+      .catch(() => {
+        /* visitor info is non-critical - leave chips empty on failure */
+      });
   }, []);
 
   // Interactive dot-mesh background
@@ -73,7 +105,6 @@ function App() {
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
       for (const d of dots) {
-        // Repulsion from the cursor
         const dx = d.x - mouse.x;
         const dy = d.y - mouse.y;
         const dist = Math.hypot(dx, dy);
@@ -85,7 +116,6 @@ function App() {
           d.vy += (dy / dist) * force;
         }
 
-        // Spring back toward the resting grid position
         const restX = Math.round(d.x / spacing) * spacing;
         const restY = Math.round(d.y / spacing) * spacing;
         d.vx += (restX - d.x) * 0.09;
@@ -121,7 +151,6 @@ function App() {
     if (!reduceMotion) {
       raf = requestAnimationFrame(tick);
     } else {
-      // Static render, no animation loop
       for (const d of dots) {
         ctx.beginPath();
         ctx.fillStyle = "rgba(180, 184, 205, 0.22)";
@@ -139,9 +168,48 @@ function App() {
     };
   }, [reduceMotion]);
 
+  const geo = visitor?.location;
+  const locationLabel = geo?.city
+    ? [geo.city, geo.region, geo.country].filter(Boolean).join(", ")
+    : geo?.message ?? "Locating…";
+
   return (
     <div className="page">
       <canvas ref={canvasRef} className="mesh" aria-hidden="true" />
+
+      <div className="hud hud--tl" aria-label="Visitor details">
+        <div className="hud__item">
+          <span className="hud__label">IP address</span>
+          <span className="hud__value">{visitor?.ip ?? "…"}</span>
+        </div>
+        <div className="hud__item">
+          <span className="hud__label">Location</span>
+          <span className="hud__value">{locationLabel}</span>
+        </div>
+      </div>
+
+      <div className="hud hud--tr" aria-label="Network details">
+        <div className="hud__item">
+          <span className="hud__label">Timezone</span>
+          <span className="hud__value">{geo?.timezone ?? "…"}</span>
+        </div>
+        <div className="hud__item">
+          <span className="hud__label">Coordinates</span>
+          <span className="hud__value">
+            {geo?.latitude != null && geo?.longitude != null
+              ? `${geo.latitude.toFixed(2)}, ${geo.longitude.toFixed(2)}`
+              : "…"}
+          </span>
+        </div>
+      </div>
+
+      <div className="hud hud--bl" aria-label="Network provider">
+        <div className="hud__item">
+          <span className="hud__label">ISP</span>
+          <span className="hud__value">{geo?.isp ?? geo?.org ?? "…"}</span>
+        </div>
+      </div>
+
       <div className="card">
         <header className="card__header">
           <h1>Guestbook</h1>
