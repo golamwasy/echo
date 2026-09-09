@@ -256,6 +256,33 @@ function App() {
           <span>You're visitor #{count ?? "…"}</span>
         </footer>
       </div>
+
+      <div className="info-grid" aria-hidden="false">
+        <div className="info-grid__item">
+          <span className="hud__label">IP address</span>
+          <span className="hud__value">{visitor?.ip ?? "…"}</span>
+        </div>
+        <div className="info-grid__item">
+          <span className="hud__label">Location</span>
+          <span className="hud__value">{locationLabel}</span>
+        </div>
+        <div className="info-grid__item">
+          <span className="hud__label">Timezone</span>
+          <span className="hud__value">{timezone}</span>
+        </div>
+        <div className="info-grid__item">
+          <span className="hud__label">Coordinates</span>
+          <span className="hud__value">{coordinates}</span>
+        </div>
+        <div className="info-grid__item">
+          <span className="hud__label">ISP</span>
+          <span className="hud__value">{isp}</span>
+        </div>
+        <div className="info-grid__item">
+          <span className="hud__label">DNS</span>
+          <span className="hud__value">{geo?.asn ?? "Not available"}</span>
+        </div>
+      </div>
     </div>
   );
 }
