@@ -40,6 +40,7 @@ docker compose down -v             # stop everything and wipe the database
 
 ## Notes
 
+- The database is on a private `echo_private` network shared only with the backend. It is not on `traefik-net`, so no other container on the host can reach it.
 - No TLS/auth — this is intended for a trusted home network behind Traefik's plain HTTP entrypoint (`web`).
 - If your Traefik uses a different entrypoint name than `web`, update the `entrypoints` label in `docker-compose.yml` for both services.
 - The frontend calls the API on the same origin (`VITE_API_URL` is empty), routed to the backend via the `/api` path prefix. Change the build arg in `docker-compose.yml` if you split the frontend and API onto different hostnames.
