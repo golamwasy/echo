@@ -44,3 +44,4 @@ docker compose down -v             # stop everything and wipe the database
 - No TLS/auth — this is intended for a trusted home network behind Traefik's plain HTTP entrypoint (`web`).
 - If your Traefik uses a different entrypoint name than `web`, update the `entrypoints` label in `docker-compose.yml` for both services.
 - The frontend calls the API on the same origin (`VITE_API_URL` is empty), routed to the backend via the `/api` path prefix. Change the build arg in `docker-compose.yml` if you split the frontend and API onto different hostnames.
+- `frontend/nginx.conf` answers scanner probes (`.php`, `wp-*`, `.git`, `.env`, `phpinfo` and similar) with a 404 and leaves them out of the access log. `frontend/public/robots.txt` asks all crawlers to stay away.
