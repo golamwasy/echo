@@ -1,0 +1,62 @@
+# Reference copy of the compose file the home server runs. The server uses its own copy
+# in ~/deploy/echo and never reads this file from git, so a change to the repo cannot
+# change how containers are started (mounts, privileges, networks).
+name: echo
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: guestbook
+      POSTGRES_USER: guestbook
+      POSTGRES_PASSWORD: guestbook
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    # Only the backend can reach the database. It is not on the shared traefik-net.
+    networks:
+      - private
+    restart: unless-stopped
+
+  frontend:
+    image: ghcr.io/golamwasy/echo-frontend:latest
+    depends_on:
+      - backend
+    networks:
+      - traefik-net
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.guestbook-app.rule=Host(`echo.golamwasy.dev`)"
+      - "traefik.http.routers.guestbook-app.entrypoints=web"
+      - "traefik.http.services.guestbook-app.loadbalancer.server.port=80"
+
+  backend:
+    image: ghcr.io/golamwasy/echo-backend:latest
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: guestbook
+      DB_USER: guestbook
+      DB_PASSWORD: guestbook
+    depends_on:
+      - postgres
+    networks:
+      - traefik-net
+      - private
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-net"
+      - "traefik.http.routers.guestbook-api.rule=Host(`echo.golamwasy.dev`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.guestbook-api.entrypoints=web"
+      - "traefik.http.services.guestbook-api.loadbalancer.server.port=8080"
+
+networks:
+  traefik-net:
+    external: true
+  # Backend and database only. "internal" also means the database has no route to the internet.
+  private:
+    internal: true
+
+volumes:
+  postgres-data:
